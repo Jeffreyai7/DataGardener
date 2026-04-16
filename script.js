@@ -32,52 +32,46 @@
      * ─────────────────────────────────────────────────────────
      */
 
-    const SHEETS_URL = "https://script.google.com/macros/s/AKfycbx-QvwGTBljZ-Uay6q9ZeoJpAl9Ch7jcGEGX3IfJnNSysDeDv_rV0fM1TyvZTwdYSKWoA/exec";
+   const SHEETS_URL = "https://script.google.com/macros/s/AKfycbwNT6DhVPqLwQw_onmKYc2cFOMlN1ZbEht4FDOTFSgllgobjyo2wkAXIQZmremMePv7xw/exec";
 
-    const form   = document.getElementById('wlform');
-    const btn    = document.getElementById('sbtn');
-    const btnTxt = document.getElementById('sbtn-txt');
-    const successEl = document.getElementById('success');
-    const formView  = document.getElementById('form-view');
-    const errorEl   = document.getElementById('form-error');
+const form      = document.getElementById('wlform');
+const btn       = document.getElementById('sbtn');
+const btnTxt    = document.getElementById('sbtn-txt');
+const successEl = document.getElementById('success');
+const formView  = document.getElementById('form-view');
+const errorEl   = document.getElementById('form-error');
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      errorEl.style.display = 'none';
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  errorEl.style.display = 'none';
 
-      // Basic validation
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-      }
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
 
-      // Collect data
-      const fd = new FormData(form);
-      const payload = Object.fromEntries(fd.entries());
+  const fd = new FormData(form);
+  const payload = Object.fromEntries(fd.entries());
 
-      // Loading state
-      btn.disabled = true;
-      btnTxt.textContent = 'Submitting…';
+  btn.disabled = true;
+  btnTxt.textContent = 'Submitting…';
 
-      try {
-        // ── Option A: Google Apps Script (production) ──────
-        if (SHEETS_URL && SHEETS_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
-          await fetch(SHEETS_URL, {
-            method: 'POST',
-            mode: 'no-cors',          // Apps Script requires no-cors
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-        }
-
-        // ── Show success (always, because no-cors hides errors) ──
-        formView.style.display = 'none';
-        successEl.style.display = 'block';
-
-      } catch (err) {
-        btn.disabled = false;
-        btnTxt.textContent = 'Secure My Priority Access';
-        errorEl.style.display = 'block';
-        console.error('Submission error:', err);
-      }
+  try {
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      // ✅ No Content-Type header — let the browser set it automatically
+      // ✅ URLSearchParams avoids the CORS preflight that triggers the 302
+      body: new URLSearchParams(payload)
     });
+
+    formView.style.display = 'none';
+    successEl.style.display = 'block';
+
+  } catch (err) {
+    btn.disabled = false;
+    btnTxt.textContent = 'Secure My Priority Access';
+    errorEl.style.display = 'block';
+    console.error('Submission error:', err);
+  }
+});
