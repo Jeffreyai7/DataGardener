@@ -40,6 +40,19 @@ const btnTxt    = document.getElementById('sbtn-txt');
 const successEl = document.getElementById('success');
 const formView  = document.getElementById('form-view');
 const errorEl   = document.getElementById('form-error');
+const FREE_DOMAINS = new Set([
+  'gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com',
+  'aol.com','protonmail.com','mail.com','zoho.com','yandex.com',
+  'live.com','msn.com','me.com','mac.com','googlemail.com',
+  'yahoo.co.uk','hotmail.co.uk','btinternet.com'
+]);
+
+function isBusinessEmail(email) {
+  const parts = email.toLowerCase().trim().split('@');
+  if (parts.length !== 2) return false;
+  const domain = parts[1];
+  return domain.includes('.') && !FREE_DOMAINS.has(domain);
+}
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -50,6 +63,15 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
+  // ── Business email check ──────────────────────────
+  const emailInput = form.querySelector('input[name="email"]');
+  if (!isBusinessEmail(emailInput.value)) {
+    emailInput.setCustomValidity('Please use your work email address.');
+    emailInput.reportValidity();
+    emailInput.addEventListener('input', () => emailInput.setCustomValidity(''), { once: true });
+    return;
+  }
+  
   const fd = new FormData(form);
   const payload = Object.fromEntries(fd.entries());
 

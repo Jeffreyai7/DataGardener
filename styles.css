@@ -185,7 +185,9 @@
     }
 
     .cta-row {
-      display: flex; align-items: center;
+      display: flex;
+      align-items: start;
+      flex-direction: column;
       flex-wrap: wrap;
       gap: 16px;
       animation: fadeUp 0.7s ease both 0.52s;
